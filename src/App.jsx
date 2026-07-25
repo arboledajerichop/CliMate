@@ -255,6 +255,7 @@ function App() {
                 code={current.weather_code}
                 temperature={currentTemperature}
                 unit={unit}
+                windSpeed={current.wind_speed_10m}
               />
             </section>
 
@@ -271,6 +272,9 @@ function App() {
                 hourly={weather.hourly}
                 currentTime={current.time}
                 convertTemperature={convertTemperature}
+                currentCode={current.weather_code}
+                currentTemperature={current.temperature_2m}
+                windSpeed={current.wind_speed_10m}
               />
               <DailyForecast
                 daily={weather.daily}

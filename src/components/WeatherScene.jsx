@@ -2,18 +2,34 @@ import { getWeatherMeta, isWetWeather } from "../utils/weatherCode";
 
 const PARTICLES = Array.from({ length: 14 }, (_, index) => index);
 
-function WeatherScene({ code, temperature, unit }) {
+function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
   const meta = getWeatherMeta(code);
   const needsUmbrella = isWetWeather(code);
+  const isSunny = meta.group === "clear";
+  const isStormy = meta.group === "storm";
+  const isSnowy = meta.group === "snow";
+  const isWindy = windSpeed >= 25 && !needsUmbrella && !isSnowy;
+  const sceneMessage = isWindy
+    ? "Breezy out there—hold onto your cap."
+    : meta.message;
 
   return (
     <section
-      className={`weather-scene weather-scene--${meta.group}`}
-      aria-label={`Illustration: ${meta.message}`}
+      className={[
+        "weather-scene",
+        `weather-scene--${meta.group}`,
+        isSunny ? "is-sunny" : "",
+        isWindy ? "is-windy" : "",
+        isStormy ? "is-stormy" : "",
+        isSnowy ? "is-snowy" : "",
+      ].filter(Boolean).join(" ")}
+      aria-label={`Illustration: ${sceneMessage}`}
     >
       <div className="scene-orb" aria-hidden="true" />
       <div className="scene-cloud scene-cloud--one" aria-hidden="true" />
       <div className="scene-cloud scene-cloud--two" aria-hidden="true" />
+      <div className="scene-lightning scene-lightning--one" aria-hidden="true" />
+      <div className="scene-lightning scene-lightning--two" aria-hidden="true" />
 
       <div className="scene-particles" aria-hidden="true">
         {PARTICLES.map((particle) => (
@@ -21,7 +37,17 @@ function WeatherScene({ code, temperature, unit }) {
         ))}
       </div>
 
-      <div className={`student ${needsUmbrella ? "has-umbrella" : ""}`} aria-hidden="true">
+      <div
+        className={[
+          "student",
+          needsUmbrella ? "has-umbrella" : "",
+          isSunny ? "student--sunny" : "",
+          isWindy ? "student--windy" : "",
+          isStormy ? "student--stormy" : "",
+          isSnowy ? "student--snowy" : "",
+        ].filter(Boolean).join(" ")}
+        aria-hidden="true"
+      >
         <div className="student-shadow" />
         {needsUmbrella && (
           <div className="umbrella">
@@ -34,6 +60,15 @@ function WeatherScene({ code, temperature, unit }) {
             <div className="umbrella-handle" />
           </div>
         )}
+        {isSunny && (
+          <>
+            <div className="student-cap">
+              <i />
+            </div>
+            <div className="sweat-drop" />
+          </>
+        )}
+        {isWindy && <div className="student-scarf"><i /></div>}
         <div className="student-hair" />
         <div className="student-head">
           <i className="student-ear" />
@@ -56,7 +91,7 @@ function WeatherScene({ code, temperature, unit }) {
       </div>
 
       <div className="scene-message">
-        <span>{meta.message}</span>
+        <span>{sceneMessage}</span>
         <strong>
           {temperature}°{unit}
         </strong>

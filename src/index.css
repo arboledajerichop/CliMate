@@ -914,6 +914,34 @@ footer {
   background: rgba(89, 102, 124, 0.45);
 }
 
+.scene-lightning {
+  position: absolute;
+  z-index: 2;
+  display: none;
+  width: 28px;
+  height: 78px;
+  background: #f6c954;
+  clip-path: polygon(52% 0, 100% 0, 68% 40%, 100% 40%, 18% 100%, 37% 56%, 0 56%);
+  filter: drop-shadow(0 0 12px rgba(255, 221, 108, 0.8));
+  animation: scene-lightning-flash 3.8s steps(1) infinite;
+}
+
+.scene-lightning--one {
+  top: 97px;
+  right: 52px;
+}
+
+.scene-lightning--two {
+  top: 56px;
+  left: 38px;
+  transform: scale(0.64);
+  animation-delay: -1.9s;
+}
+
+.weather-scene--storm .scene-lightning {
+  display: block;
+}
+
 .scene-particles {
   position: absolute;
   z-index: 4;
@@ -1020,6 +1048,71 @@ footer {
   border-radius: 3px 17px 9px 6px;
   background: #2e3134;
   transform: rotate(-8deg);
+}
+
+.student-cap {
+  position: absolute;
+  z-index: 9;
+  width: 77px;
+  height: 29px;
+  top: 32px;
+  left: 43px;
+  border-radius: 38px 43px 12px 9px;
+  background: #e37f63;
+  transform: rotate(-4deg);
+  box-shadow: inset -8px -4px 0 rgba(152, 58, 48, 0.12);
+}
+
+.student-cap i {
+  position: absolute;
+  width: 37px;
+  height: 8px;
+  right: -25px;
+  bottom: 0;
+  border-radius: 3px 13px 12px 3px;
+  background: #d76f57;
+  transform: rotate(5deg);
+}
+
+.sweat-drop {
+  position: absolute;
+  z-index: 10;
+  width: 8px;
+  height: 12px;
+  top: 76px;
+  right: 34px;
+  border-radius: 50% 50% 58% 42%;
+  background: #6ca9be;
+  transform: rotate(35deg);
+  animation: sweat-slide 2.4s ease-in-out infinite;
+}
+
+.student-scarf {
+  position: absolute;
+  z-index: 8;
+  width: 70px;
+  height: 18px;
+  top: 119px;
+  left: 47px;
+  border-radius: 9px;
+  background: #e68a69;
+  transform: rotate(-4deg);
+}
+
+.student-scarf i {
+  position: absolute;
+  width: 75px;
+  height: 17px;
+  left: 50px;
+  top: 4px;
+  border-radius: 4px 14px 14px 4px;
+  background: #de7d60;
+  transform-origin: left center;
+  animation: scarf-wave 1.1s ease-in-out infinite alternate;
+}
+
+.student--windy .student-hair {
+  animation: hair-blow 850ms ease-in-out infinite alternate;
 }
 
 .student-ear {
@@ -1137,6 +1230,36 @@ footer {
   transform: rotate(-52deg);
 }
 
+.student--sunny .student-arm--left {
+  top: 126px;
+  left: 35px;
+  transform: rotate(139deg);
+}
+
+.student--sunny .student-arm--left::after {
+  bottom: -7px;
+}
+
+.student--stormy .student-arm--left {
+  left: 17px;
+  transform: rotate(34deg);
+}
+
+.student--stormy .student-arm--right {
+  right: 9px;
+  transform: rotate(-61deg);
+}
+
+.student--snowy .student-body,
+.student--snowy .student-arm {
+  background: #5a7486;
+}
+
+.student--snowy .student-arm::after {
+  background: #e08b67;
+  box-shadow: inset 0 -5px 0 rgba(128, 57, 52, 0.18);
+}
+
 .student-leg {
   position: absolute;
   z-index: 2;
@@ -1174,6 +1297,10 @@ footer {
 .student-shoe--right {
   right: 29px;
   transform: scaleX(-1);
+}
+
+.student--windy .student-body {
+  animation: jacket-flutter 900ms ease-in-out infinite alternate;
 }
 
 .umbrella {
@@ -1240,6 +1367,10 @@ footer {
   border-right: 4px solid #4b5d63;
   border-bottom: 4px solid #4b5d63;
   border-radius: 0 0 13px 0;
+}
+
+.student--stormy .umbrella {
+  animation: storm-umbrella 480ms ease-in-out infinite alternate;
 }
 
 .scene-message {
@@ -1450,6 +1581,94 @@ footer {
   scrollbar-color: rgba(75, 113, 120, 0.25) transparent;
   scrollbar-width: thin;
   scroll-snap-type: x proximity;
+}
+
+.weather-advice {
+  display: grid;
+  grid-template-columns: minmax(200px, 0.85fr) minmax(360px, 1.15fr);
+  gap: 22px;
+  margin-top: 20px;
+  padding: 18px 20px;
+  border: 1px solid rgba(47, 113, 133, 0.1);
+  border-radius: 18px;
+  background:
+    linear-gradient(115deg, rgba(229, 240, 238, 0.9), rgba(245, 247, 241, 0.95));
+}
+
+.advice-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.advice-intro .eyebrow {
+  margin: 1px 0 2px;
+  font-size: 0.55rem;
+}
+
+.advice-intro h3 {
+  margin: 0;
+  font-family: "Manrope", sans-serif;
+  font-size: 0.9rem;
+}
+
+.advice-intro p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.66rem;
+  line-height: 1.45;
+}
+
+.advice-shield {
+  position: relative;
+  display: grid;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 40px;
+  place-items: center;
+  background: var(--blue-dark);
+  clip-path: polygon(50% 0, 92% 16%, 86% 70%, 50% 100%, 14% 70%, 8% 16%);
+}
+
+.advice-shield i {
+  width: 12px;
+  height: 7px;
+  border-left: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: translateY(-2px) rotate(-45deg);
+}
+
+.weather-advice ul {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  align-content: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.weather-advice li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 41px;
+  padding: 8px 9px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #526d73;
+  font-size: 0.63rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.weather-advice li > i {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 0 0 3px rgba(232, 139, 109, 0.13);
 }
 
 .hourly-card {
@@ -1728,6 +1947,35 @@ footer span:first-child {
   50% { transform: rotate(1.6deg); }
 }
 
+@keyframes sweat-slide {
+  0%, 25% { opacity: 0; transform: translateY(-5px) rotate(35deg); }
+  45% { opacity: 1; }
+  80%, 100% { opacity: 0; transform: translateY(9px) rotate(35deg); }
+}
+
+@keyframes scarf-wave {
+  to { transform: rotate(8deg) translateY(4px); }
+}
+
+@keyframes hair-blow {
+  to { transform: rotate(-7deg) skewX(-8deg); }
+}
+
+@keyframes jacket-flutter {
+  to { transform: skewX(-2deg); }
+}
+
+@keyframes storm-umbrella {
+  from { transform: rotate(-1.5deg); }
+  to { transform: rotate(1.5deg); }
+}
+
+@keyframes scene-lightning-flash {
+  0%, 87%, 100% { opacity: 0; }
+  88%, 90%, 94% { opacity: 1; }
+  89%, 92% { opacity: 0.15; }
+}
+
 @media (max-width: 980px) {
   .hero-grid {
     grid-template-columns: minmax(300px, 0.8fr) minmax(380px, 1.1fr);
@@ -1804,6 +2052,10 @@ footer span:first-child {
 
   .weather-details {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .weather-advice {
+    grid-template-columns: 1fr;
   }
 
   footer {
@@ -1905,6 +2157,15 @@ footer span:first-child {
   .forecast-panel {
     padding: 22px 17px;
     border-radius: 21px;
+  }
+
+  .weather-advice {
+    margin-top: 16px;
+    padding: 15px;
+  }
+
+  .weather-advice ul {
+    grid-template-columns: 1fr;
   }
 
   .daily-row {
