@@ -9,15 +9,31 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
   const isStormy = meta.group === "storm";
   const isSnowy = meta.group === "snow";
   const isWindy = windSpeed >= 25 && !needsUmbrella && !isSnowy;
-  const sceneMessage = isWindy
-    ? "Breezy out there—hold onto your cap."
-    : meta.message;
+  const isCloudy = !isSunny && !isWindy && !needsUmbrella;
+  const sceneState = isStormy
+    ? "stormy"
+    : needsUmbrella
+      ? "rainy"
+      : isWindy
+        ? "windy"
+        : isSunny
+          ? "sunny"
+          : "cloudy";
+  const sceneMessage =
+    sceneState === "sunny"
+      ? "Cap on—take a cool-down break when you need it."
+      : sceneState === "windy"
+        ? "Breezy out there—hold onto loose belongings."
+        : sceneState === "cloudy"
+          ? "A calm, cloudy day to take at your own pace."
+          : meta.message;
 
   return (
     <section
       className={[
         "weather-scene",
         `weather-scene--${meta.group}`,
+        `weather-scene--state-${sceneState}`,
         isSunny ? "is-sunny" : "",
         isWindy ? "is-windy" : "",
         isStormy ? "is-stormy" : "",
@@ -30,6 +46,16 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
       <div className="scene-cloud scene-cloud--two" aria-hidden="true" />
       <div className="scene-lightning scene-lightning--one" aria-hidden="true" />
       <div className="scene-lightning scene-lightning--two" aria-hidden="true" />
+      <div className="wind-streaks" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <i />
+      </div>
+      <div className="rain-puddle" aria-hidden="true">
+        <i />
+        <i />
+      </div>
 
       <div className="scene-particles" aria-hidden="true">
         {PARTICLES.map((particle) => (
@@ -42,6 +68,7 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
           "student",
           needsUmbrella ? "has-umbrella" : "",
           isSunny ? "student--sunny" : "",
+          isCloudy ? "student--cloudy" : "",
           isWindy ? "student--windy" : "",
           isStormy ? "student--stormy" : "",
           isSnowy ? "student--snowy" : "",
@@ -68,7 +95,6 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
             <div className="sweat-drop" />
           </>
         )}
-        {isWindy && <div className="student-scarf"><i /></div>}
         <div className="student-hair" />
         <div className="student-head">
           <i className="student-ear" />
@@ -81,9 +107,16 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
         <div className="student-body">
           <i className="student-collar student-collar--one" />
           <i className="student-collar student-collar--two" />
+          {isWindy && <i className="student-jacket-flap" />}
         </div>
-        <div className="student-arm student-arm--left" />
-        <div className="student-arm student-arm--right" />
+        <div className="student-arm student-arm--left"><i /></div>
+        <div className="student-arm student-arm--right"><i /></div>
+        {isStormy && (
+          <div className="storm-grip">
+            <i />
+            <i />
+          </div>
+        )}
         <div className="student-leg student-leg--left" />
         <div className="student-leg student-leg--right" />
         <div className="student-shoe student-shoe--left" />
