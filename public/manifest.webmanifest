@@ -1,0 +1,18 @@
+{
+  "name": "MeteoMood — Forecasts you can feel",
+  "short_name": "MeteoMood",
+  "description": "Animated, human weather forecasts for any city in the world.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f8f5",
+  "theme_color": "#f4f8f5",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
