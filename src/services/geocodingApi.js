@@ -1,6 +1,27 @@
 const GEOCODING_API_URL =
   "https://geocoding-api.open-meteo.com/v1/search";
 
+async function fetchWithTimeout(url, timeout = 9000) {
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), timeout);
+
+  try {
+    return await fetch(url, {
+      signal: controller.signal,
+      headers: { Accept: "application/json" },
+    });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error("The search took too long. Please try again.", {
+        cause: error,
+      });
+    }
+    throw error;
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
+
 export async function searchLocations(searchText) {
   const cleanSearchText = searchText.trim();
 
@@ -15,9 +36,13 @@ export async function searchLocations(searchText) {
     format: "json",
   });
 
-  const response = await fetch(
-    `${GEOCODING_API_URL}?${parameters}`
-  );
+  const isHosted =
+    typeof window !== "undefined" &&
+    window.location.hostname.endsWith(".chatgpt.site");
+  const requestUrl = isHosted
+    ? `/api/geocode?${parameters}`
+    : `${GEOCODING_API_URL}?${parameters}`;
+  const response = await fetchWithTimeout(requestUrl);
 
   if (!response.ok) {
     throw new Error("Unable to search for locations.");

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { searchLocations } from "../services/geocodingApi";
 
 function LocationSearch({ onSelectLocation, disabled }) {
@@ -9,49 +9,67 @@ function LocationSearch({ onSelectLocation, disabled }) {
   const [activeIndex, setActiveIndex] = useState(-1);
   const requestId = useRef(0);
 
-  useEffect(() => {
-    const cleanSearch = searchText.trim();
+  const runSearch = useCallback(async (value) => {
+    const cleanSearch = value.trim();
+
     if (cleanSearch.length < 2) {
-      return undefined;
+      setError("Enter at least two letters.");
+      setResults([]);
+      return;
     }
 
-    const timer = window.setTimeout(async () => {
-      const currentRequest = ++requestId.current;
-      setSearching(true);
-      setError("");
+    const currentRequest = ++requestId.current;
+    setSearching(true);
+    setError("");
 
-      try {
-        const locations = await searchLocations(cleanSearch);
-        if (currentRequest !== requestId.current) return;
-        setResults(locations);
-        setActiveIndex(-1);
-        if (!locations.length) setError("No places found. Try a nearby city.");
-      } catch (requestError) {
-        if (currentRequest !== requestId.current) return;
-        setError(
-          requestError instanceof Error
-            ? requestError.message
-            : "Unable to search right now."
-        );
-      } finally {
-        if (currentRequest === requestId.current) setSearching(false);
+    try {
+      const locations = await searchLocations(cleanSearch);
+      if (currentRequest !== requestId.current) return;
+      setResults(locations);
+      setActiveIndex(-1);
+      if (!locations.length) {
+        setError("No places found. Try a nearby city or add the country.");
       }
-    }, 350);
+    } catch (requestError) {
+      if (currentRequest !== requestId.current) return;
+      setResults([]);
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Unable to search right now."
+      );
+    } finally {
+      if (currentRequest === requestId.current) setSearching(false);
+    }
+  }, []);
 
+  useEffect(() => {
+    const cleanSearch = searchText.trim();
+    if (cleanSearch.length < 2) return undefined;
+
+    const timer = window.setTimeout(() => runSearch(cleanSearch), 500);
     return () => window.clearTimeout(timer);
-  }, [searchText]);
+  }, [runSearch, searchText]);
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    runSearch(searchText);
+  }
 
   function handleSelect(location) {
+    requestId.current += 1;
     onSelectLocation(location);
     setSearchText("");
     setResults([]);
     setError("");
     setActiveIndex(-1);
+    setSearching(false);
   }
 
   function handleChange(event) {
     const value = event.target.value;
     setSearchText(value);
+
     if (value.trim().length < 2) {
       requestId.current += 1;
       setResults([]);
@@ -62,6 +80,12 @@ function LocationSearch({ onSelectLocation, disabled }) {
   }
 
   function handleKeyDown(event) {
+    if (event.key === "Escape") {
+      setResults([]);
+      setActiveIndex(-1);
+      return;
+    }
+
     if (!results.length) return;
 
     if (event.key === "ArrowDown") {
@@ -76,38 +100,42 @@ function LocationSearch({ onSelectLocation, disabled }) {
       event.preventDefault();
       handleSelect(results[activeIndex]);
     }
-    if (event.key === "Escape") {
-      setResults([]);
-      setActiveIndex(-1);
-    }
   }
 
   return (
     <section className="location-search">
-      <div className="search-icon" aria-hidden="true" />
-      <label className="sr-only" htmlFor="location-search">
-        Search for a city or country
-      </label>
-      <input
-        id="location-search"
-        type="search"
-        role="combobox"
-        aria-expanded={results.length > 0}
-        aria-controls="location-results"
-        aria-autocomplete="list"
-        aria-activedescendant={activeIndex >= 0 ? `location-option-${activeIndex}` : undefined}
-        value={searchText}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        placeholder="Search any city or place..."
-        autoComplete="off"
-        disabled={disabled}
-      />
-      <span className={`search-status ${searching ? "is-searching" : ""}`}>
-        {searching ? "Searching" : "Worldwide"}
-      </span>
+      <form className="location-search-form" onSubmit={handleSubmit}>
+        <div className="search-icon" aria-hidden="true" />
+        <label className="sr-only" htmlFor="location-search">
+          Search for a city or country
+        </label>
+        <input
+          id="location-search"
+          type="search"
+          role="combobox"
+          aria-expanded={results.length > 0}
+          aria-controls="location-results"
+          aria-autocomplete="list"
+          aria-activedescendant={
+            activeIndex >= 0 ? `location-option-${activeIndex}` : undefined
+          }
+          value={searchText}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Try Tokyo, Paris, New York..."
+          autoComplete="off"
+          disabled={disabled}
+        />
+        <button
+          className="search-submit"
+          type="submit"
+          disabled={disabled || searching || searchText.trim().length < 2}
+        >
+          {searching ? <span className="button-spinner" aria-label="Searching" /> : "Search"}
+        </button>
+      </form>
 
-      {error && <p className="search-error">{error}</p>}
+      {error && <p className="search-error" role="alert">{error}</p>}
 
       {results.length > 0 && (
         <ul className="search-results" id="location-results" role="listbox">

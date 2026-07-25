@@ -30,6 +30,7 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
 
   return (
     <section
+      data-weather-state={sceneState}
       className={[
         "weather-scene",
         `weather-scene--${meta.group}`,
@@ -114,6 +115,11 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
         {isStormy && (
           <div className="storm-grip">
             <i />
+            <i />
+          </div>
+        )}
+        {needsUmbrella && !isStormy && (
+          <div className="rain-grip">
             <i />
           </div>
         )}
