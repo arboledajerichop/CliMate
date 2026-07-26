@@ -1,6 +1,10 @@
+import AmbientSound from "./AmbientSound";
 import { getWeatherMeta, isWetWeather } from "../utils/weatherCode";
 
-const PARTICLES = Array.from({ length: 14 }, (_, index) => index);
+const PARTICLES = Array.from({ length: 18 }, (_, index) => index);
+const BUILDINGS = Array.from({ length: 6 }, (_, index) => index);
+const TREES = Array.from({ length: 5 }, (_, index) => index);
+const LEAVES = Array.from({ length: 8 }, (_, index) => index);
 
 function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
   const meta = getWeatherMeta(code);
@@ -48,9 +52,9 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
     : meta.group;
   const sceneMessage =
     sceneState === "sunny"
-      ? "Cap on—take a cool-down break when you need it."
+      ? "Bright outside - take a cool-down break when you need it."
       : sceneState === "windy"
-        ? "Breezy out there—hold onto loose belongings."
+        ? "Breezy out there - keep loose belongings close."
         : sceneState === "cloudy"
           ? "A calm, cloudy day to take at your own pace."
           : meta.message;
@@ -69,6 +73,34 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
       ].filter(Boolean).join(" ")}
       aria-label={`Illustration: ${sceneMessage}`}
     >
+      <AmbientSound sceneState={sceneState} />
+
+      <div className="scene-atmosphere" aria-hidden="true">
+        <i className="scene-glow" />
+        <i className="scene-haze" />
+        <i className="scene-mist" />
+      </div>
+
+      <div className="scene-landscape" aria-hidden="true">
+        <i className="scene-hill scene-hill--back" />
+        <i className="scene-hill scene-hill--front" />
+        <div className="scene-town">
+          {BUILDINGS.map((building) => (
+            <i key={building} />
+          ))}
+        </div>
+        <div className="scene-trees">
+          {TREES.map((tree) => (
+            <i key={tree} />
+          ))}
+        </div>
+      </div>
+
+      <div className="scene-ground" aria-hidden="true">
+        <i className="scene-path" />
+        <i className="scene-ground-shine" />
+      </div>
+
       <div className="scene-orb" aria-hidden="true" />
       <div className="scene-cloud scene-cloud--one" aria-hidden="true" />
       <div className="scene-cloud scene-cloud--two" aria-hidden="true" />
@@ -84,6 +116,11 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
         <i />
         <i />
         <i />
+      </div>
+      <div className="scene-leaves" aria-hidden="true">
+        {LEAVES.map((leaf) => (
+          <i key={leaf} />
+        ))}
       </div>
       <div className="scene-lightning scene-lightning--one" aria-hidden="true" />
       <div className="scene-lightning scene-lightning--two" aria-hidden="true" />
@@ -146,6 +183,7 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
           <i className="student-ear" />
           <i className="student-eye student-eye--one" />
           <i className="student-eye student-eye--two" />
+          <i className="student-nose" />
           <i className="student-smile" />
         </div>
         <div className="student-neck" />
@@ -153,18 +191,11 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
         <div className="student-body">
           <i className="student-collar student-collar--one" />
           <i className="student-collar student-collar--two" />
+          <i className="student-shirt-seam" />
           {isWindy && <i className="student-jacket-flap" />}
         </div>
         <div className="student-arm student-arm--left"><i /></div>
         <div className="student-arm student-arm--right"><i /></div>
-        {isSunny && (
-          <div className="sun-wipe">
-            <i className="sun-wipe-upper" />
-            <i className="sun-wipe-forearm" />
-            <i className="sun-wipe-hand" />
-            <span />
-          </div>
-        )}
         {isStormy && (
           <div className="storm-grip">
             <i />
@@ -185,7 +216,7 @@ function WeatherScene({ code, temperature, unit, windSpeed = 0 }) {
       <div className="scene-message">
         <span>{sceneMessage}</span>
         <strong>
-          {temperature}°{unit}
+          {temperature}&deg;{unit}
         </strong>
       </div>
     </section>

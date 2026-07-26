@@ -1,6 +1,6 @@
 {
-  "name": "MeteoMood — Forecasts you can feel",
-  "short_name": "MeteoMood",
+  "name": "JerichoMood — Forecasts you can feel",
+  "short_name": "JerichoMood",
   "description": "Animated, human weather forecasts for any city in the world.",
   "start_url": "/",
   "display": "standalone",

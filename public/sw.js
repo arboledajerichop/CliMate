@@ -1,4 +1,4 @@
-const CACHE_NAME = "meteomood-v1";
+const CACHE_NAME = "jerichomood-v1";
 const APP_SHELL = ["/", "/manifest.webmanifest", "/favicon.svg", "/og.png"];
 
 self.addEventListener("install", (event) => {

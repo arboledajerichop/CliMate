@@ -11,7 +11,7 @@ const workerSource = readFileSync(
 )
 
 const staticWorker = {
-  name: 'meteomood-static-worker',
+  name: 'jerichomood-static-worker',
   configureServer(server) {
     const localEnv = loadEnv('development', process.cwd(), '')
 

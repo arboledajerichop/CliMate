@@ -139,12 +139,12 @@ function App() {
   return (
     <div className={`app-shell weather-theme--${weatherMeta.group}`}>
       <header className="topbar">
-        <a className="brand" href="/" aria-label="MeteoMood home">
+        <a className="brand" href="/" aria-label="JerichoMood home">
           <span className="brand-mark" aria-hidden="true">
             <i />
           </span>
           <span>
-            <strong>MeteoMood</strong>
+            <strong>JerichoMood</strong>
             <small>Forecasts you can feel</small>
           </span>
         </a>
@@ -294,7 +294,7 @@ function App() {
       </main>
 
       <footer>
-        <span>MeteoMood</span>
+        <span>JerichoMood</span>
         <p>Weather data refreshed from Open-Meteo.</p>
         <span>Made for every forecast</span>
       </footer>
