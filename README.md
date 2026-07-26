@@ -4,8 +4,6 @@
 
 JerichoMood is a responsive weather application that combines practical forecasts with animated weather scenes, optional ambient sound, and a forecast-grounded activity assistant.
 
-![JerichoMood preview](public/og.png)
-
 ## Features
 
 - Current conditions, hourly forecasts, and a seven-day outlook

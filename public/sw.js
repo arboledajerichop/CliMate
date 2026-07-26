@@ -1,5 +1,5 @@
 const CACHE_NAME = "jerichomood-v1";
-const APP_SHELL = ["/", "/manifest.webmanifest", "/favicon.svg", "/og.png"];
+const APP_SHELL = ["/", "/manifest.webmanifest", "/favicon.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
