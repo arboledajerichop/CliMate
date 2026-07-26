@@ -3,6 +3,7 @@ import DailyForecast from "./components/DailyForecast";
 import HourlyForecast from "./components/HourlyForecast";
 import LocationSearch from "./components/LocationSearch";
 import WeatherDetails from "./components/WeatherDetails";
+import WeatherAssistant from "./components/WeatherAssistant";
 import WeatherIcon from "./components/WeatherIcon";
 import WeatherScene from "./components/WeatherScene";
 import { getCurrentWeather } from "./services/weatherApi";
@@ -265,6 +266,13 @@ function App() {
               windDirection={current.wind_direction_10m}
               rainChance={weather.hourly.precipitation_probability[0] ?? 0}
               pressure={Math.round(current.pressure_msl)}
+            />
+
+            <WeatherAssistant
+              key={`${locationName}-${unit}`}
+              weather={weather}
+              locationName={locationName}
+              unit={unit}
             />
 
             <section className="forecast-layout">

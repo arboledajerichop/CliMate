@@ -3,3 +3,6 @@ dist/
 .vite-dev.log
 .vite-dev-error.log
 *.tar.gz
+.env
+.env.*
+!.env.example

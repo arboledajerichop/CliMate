@@ -21,6 +21,9 @@ export async function getCurrentWeather(latitude, longitude) {
       "weather_code",
       "precipitation_probability",
       "apparent_temperature",
+      "relative_humidity_2m",
+      "wind_speed_10m",
+      "uv_index",
     ].join(","),
     daily: [
       "weather_code",
@@ -29,6 +32,7 @@ export async function getCurrentWeather(latitude, longitude) {
       "precipitation_probability_max",
       "sunrise",
       "sunset",
+      "uv_index_max",
     ].join(","),
     timezone: "auto",
     forecast_days: "7",

@@ -1,52 +1,52 @@
-import { defineConfig } from 'vite'
+import { Buffer } from 'node:buffer'
+import { readFileSync } from 'node:fs'
+import process from 'node:process'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import weatherWorker from './worker/index.js'
+
+const workerSource = readFileSync(
+  new URL('./worker/index.js', import.meta.url),
+  'utf8'
+)
 
 const staticWorker = {
   name: 'meteomood-static-worker',
+  configureServer(server) {
+    const localEnv = loadEnv('development', process.cwd(), '')
+
+    server.middlewares.use(async (request, response, next) => {
+      if (!request.url?.startsWith('/api/ask')) {
+        next()
+        return
+      }
+
+      const chunks = []
+      for await (const chunk of request) chunks.push(chunk)
+      const body = Buffer.concat(chunks)
+      const webRequest = new Request(
+        new URL(request.url, `http://${request.headers.host || 'localhost'}`),
+        {
+          method: request.method,
+          headers: request.headers,
+          body: body.length ? body : undefined,
+        }
+      )
+      const webResponse = await weatherWorker.fetch(webRequest, {
+        GROQ_API_KEY: localEnv.GROQ_API_KEY,
+        GROQ_MODEL: localEnv.GROQ_MODEL,
+      })
+
+      response.statusCode = webResponse.status
+      webResponse.headers.forEach((value, key) => response.setHeader(key, value))
+      response.end(Buffer.from(await webResponse.arrayBuffer()))
+    })
+  },
   generateBundle() {
     this.emitFile({
       type: 'asset',
       fileName: 'server/index.js',
-      source: `export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-
-    if (url.pathname === "/api/geocode") {
-      const upstream = new URL("https://geocoding-api.open-meteo.com/v1/search");
-      for (const [key, value] of url.searchParams) {
-        upstream.searchParams.append(key, value);
-      }
-
-      try {
-        const response = await fetch(upstream, {
-          headers: { "Accept": "application/json" }
-        });
-        return new Response(response.body, {
-          status: response.status,
-          headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "public, max-age=120"
-          }
-        });
-      } catch {
-        return Response.json(
-          { error: "Location search is temporarily unavailable." },
-          { status: 502 }
-        );
-      }
-    }
-
-    let response = await env.ASSETS.fetch(request);
-    const acceptsHtml = request.headers.get("accept")?.includes("text/html");
-
-    if (response.status === 404 && request.method === "GET" && acceptsHtml) {
-      response = await env.ASSETS.fetch(new Request(new URL("/", request.url), request));
-    }
-
-    return response;
-  }
-};
-`,
+      source: workerSource,
     })
   },
 }
