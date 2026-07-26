@@ -79,9 +79,24 @@ Weather forecasts and location search do not require API keys.
 | `npm run preview` | Serves the production build locally. |
 | `npm run lint` | Runs ESLint across the project. |
 
+## Netlify deployment
+
+Deploy the complete repository through Netlify rather than uploading only the `dist` folder. The included `netlify.toml` builds the app, publishes `dist`, and deploys the serverless function used by `/api/ask`.
+
+In **Netlify > Project configuration > Environment variables**, add:
+
+```env
+GROQ_API_KEY=your_groq_api_key
+GROQ_MODEL=openai/gpt-oss-20b
+```
+
+After adding or changing either variable, trigger a new deployment. Never expose the Groq key through a `VITE_` variable or frontend code.
+
 ## Project structure
 
 ```text
+netlify/
+  functions/    Netlify serverless function for the weather assistant
 src/
   components/   Interface, forecast, scene, sound, and assistant components
   services/     Weather, geocoding, location, and assistant requests
