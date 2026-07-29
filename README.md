@@ -90,7 +90,24 @@ GROQ_API_KEY=your_groq_api_key
 GROQ_MODEL=openai/gpt-oss-20b
 ```
 
-After adding or changing either variable, trigger a new deployment. Never expose the Groq key through a `VITE_` variable or frontend code.
+Set the scope for `GROQ_API_KEY` and `GROQ_MODEL` to include **Functions**.
+After adding or changing either variable, trigger a new deployment. Never expose
+the Groq key through a `VITE_` variable or frontend code.
+
+After deployment, open `/api/ask` on your Netlify domain. A working function
+returns JSON similar to:
+
+```json
+{
+  "ok": true,
+  "configured": true,
+  "model": "openai/gpt-oss-20b"
+}
+```
+
+If `configured` is `false`, the key is missing from the Functions runtime. If
+the URL returns the app's HTML instead of JSON, deploy the complete Git
+repository rather than uploading only `dist`.
 
 ## Project structure
 

@@ -122,17 +122,15 @@ function createGroqRequestBody(env, messages, strict = true) {
     temperature: 0.35,
     max_completion_tokens: strict ? 600 : 900,
     stream: false,
-    include_reasoning: false,
-    reasoning_effort: "low",
     ...(strict
       ? {
           response_format: {
-          type: "json_schema",
-          json_schema: {
-            name: "jerichomood_weather_answer",
-            strict: true,
-            schema: RESPONSE_SCHEMA,
-          },
+            type: "json_schema",
+            json_schema: {
+              name: "jerichomood_weather_answer",
+              strict: true,
+              schema: RESPONSE_SCHEMA,
+            },
           },
         }
       : {}),
@@ -140,14 +138,85 @@ function createGroqRequestBody(env, messages, strict = true) {
 }
 
 async function requestGroq(env, messages, strict = true) {
-  return fetch(GROQ_API_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${env.GROQ_API_KEY}`,
-      "Content-Type": "application/json",
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20_000);
+
+  try {
+    return await fetch(GROQ_API_URL, {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        Authorization: `Bearer ${env.GROQ_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(createGroqRequestBody(env, messages, strict)),
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function createGroqErrorResponse(response) {
+  const details = await response.json().catch(() => ({}));
+  const upstreamMessage = cleanText(details?.error?.message, 300);
+
+  if (response.status === 401 || response.status === 403) {
+    return jsonResponse(
+      {
+        error:
+          "Groq rejected the API key. Check GROQ_API_KEY in Netlify's environment variables and redeploy.",
+        code: "GROQ_AUTH_ERROR",
+      },
+      502
+    );
+  }
+
+  if (response.status === 404) {
+    return jsonResponse(
+      {
+        error:
+          "The configured Groq model is unavailable. Use openai/gpt-oss-20b and redeploy.",
+        code: "GROQ_MODEL_ERROR",
+      },
+      502
+    );
+  }
+
+  if (response.status === 429) {
+    const retryAfter = response.headers.get("retry-after");
+    return jsonResponse(
+      {
+        error:
+          "Meteo reached Groq's free-tier limit. Please wait a moment and try again.",
+        code: "GROQ_RATE_LIMIT",
+      },
+      429,
+      retryAfter ? { "Retry-After": retryAfter } : {}
+    );
+  }
+
+  if (response.status === 400 || response.status === 422) {
+    return jsonResponse(
+      {
+        error:
+          "Groq could not process this forecast question. Please try a shorter question.",
+        code: "GROQ_REQUEST_ERROR",
+      },
+      502
+    );
+  }
+
+  return jsonResponse(
+    {
+      error:
+        response.status >= 500
+          ? "Groq is temporarily unavailable. Please try again shortly."
+          : "The weather assistant could not answer right now.",
+      code: "GROQ_UPSTREAM_ERROR",
+      ...(upstreamMessage ? { detail: upstreamMessage } : {}),
     },
-    body: JSON.stringify(createGroqRequestBody(env, messages, strict)),
-  });
+    502
+  );
 }
 
 async function handleAsk(request, env) {
@@ -214,31 +283,27 @@ async function handleAsk(request, env) {
   try {
     upstream = await requestGroq(env, messages);
 
-    if (upstream.status === 400) {
+    if (upstream.status === 400 || upstream.status === 422) {
       upstream = await requestGroq(env, messages, false);
     }
-  } catch {
+  } catch (error) {
     return jsonResponse(
-      { error: "The weather assistant is temporarily unreachable." },
-      502
+      {
+        error:
+          error instanceof DOMException && error.name === "AbortError"
+            ? "Groq took too long to respond. Please try again."
+            : "The weather assistant is temporarily unreachable.",
+        code:
+          error instanceof DOMException && error.name === "AbortError"
+            ? "GROQ_TIMEOUT"
+            : "GROQ_UNREACHABLE",
+      },
+      504
     );
   }
 
   if (!upstream.ok) {
-    if (upstream.status === 429) {
-      return jsonResponse(
-        {
-          error:
-            "Meteo is taking a short weather break. Please try again in a moment.",
-        },
-        429
-      );
-    }
-
-    return jsonResponse(
-      { error: "The weather assistant could not answer right now." },
-      502
-    );
+    return createGroqErrorResponse(upstream);
   }
 
   try {

@@ -78,14 +78,42 @@ export async function askWeatherAssistant({
   history,
   forecast,
 }) {
-  const response = await fetch("/api/ask", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ question, history, forecast }),
-  });
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 25_000);
+  let response;
+
+  try {
+    response = await fetch("/api/ask", {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ question, history, forecast }),
+    });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error("Meteo took too long to respond. Please try again.", {
+        cause: error,
+      });
+    }
+
+    throw new Error(
+      "Meteo could not reach its server. Please check your connection and try again.",
+      { cause: error }
+    );
+  } finally {
+    window.clearTimeout(timeout);
+  }
+
+  const contentType = response.headers.get("content-type") || "";
+
+  if (!contentType.includes("application/json")) {
+    throw new Error(
+      "The Meteo server function is missing from this deployment. Deploy the complete repository through Netlify, not only the dist folder."
+    );
+  }
 
   const result = await response.json().catch(() => ({}));
 
@@ -99,4 +127,3 @@ export async function askWeatherAssistant({
 
   return result.answer;
 }
-
