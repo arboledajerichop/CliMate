@@ -109,6 +109,24 @@ If `configured` is `false`, the key is missing from the Functions runtime. If
 the URL returns the app's HTML instead of JSON, deploy the complete Git
 repository rather than uploading only `dist`.
 
+## Vercel deployment
+
+Import the GitHub repository into Vercel and keep the detected framework preset
+as **Vite**. The included `vercel.json` runs `npm run build`, publishes `dist`,
+and deploys `api/ask.mjs` as the serverless endpoint used by the assistant.
+
+In **Vercel > Project Settings > Environment Variables**, add these variables
+for Production (and Preview if you want assistant testing on preview URLs):
+
+```env
+GROQ_API_KEY=your_groq_api_key
+GROQ_MODEL=openai/gpt-oss-20b
+```
+
+After adding or changing either variable, create a new deployment. Open
+`/api/ask` on the Vercel domain to verify the function. It should return JSON
+with `"configured": true` and `"platform": "vercel"`.
+
 ## Project structure
 
 ```text
