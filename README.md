@@ -2,108 +2,91 @@
 
 **See the weather. Plan better.**
 
-CliMate is a responsive, installable weather application that combines practical forecasts with expressive animated scenes, preventive guidance, and optional ambient sound.
+CliMate is a responsive, installable weather app that turns live forecasts into animated scenes, immersive ambient sound, and practical guidance for the day ahead. It works worldwide, with an additional official PAGASA tropical-cyclone section for locations in the Philippines.
 
-## Features
+## Highlights
 
-- Current conditions, an interactive 24-hour Day in Motion timeline, and a seven-day outlook
-- City search and browser-based current location
-- Celsius and Fahrenheit support
-- Animated student scenes for sunny, cloudy, windy, rainy, stormy, and snowy weather
-- Location-aware morning, daytime, sunset, and night scene variants
-- Optional spatial weather soundscapes with moving wind and rain, environmental layers, time-aware wildlife, and volume control
-- Corrected current-hour rain probability and UV information
-- Condition-aware preventive measures, dos and don'ts, and suggested weather windows
-- Clear rain-chance labels in the Day in Motion timeline and seven-day forecast
+- Live current conditions powered by Open-Meteo
+- Search for cities worldwide or use the device's current location
+- Interactive 24-hour **Day in Motion** timeline and seven-day outlook
+- Weather- and time-aware animated student scenes for clear, cloudy, windy, rainy, stormy, and snowy conditions
+- Morning, daytime, sunset, and night scenery
+- Optional Web Audio soundscapes with rain intensity, wind, leaves, birds, crickets, owls, frogs, and other environmental details
+- Condition-aware preventive measures, dos and don'ts, and useful reminders
 - Saved and recently viewed locations
-- Philippine Typhoon Center with live official PAGASA bulletin, track, strength, movement, and wind-signal information
-- Installable Progressive Web App with offline app-shell support
-- Responsive, keyboard-accessible interface with reduced-motion support
+- Celsius and Fahrenheit support
+- Official PAGASA tropical-cyclone bulletins for the Philippines, including movement, strength, track images, wind signals, and source links when available
+- Installable Progressive Web App with an offline app shell
+- Responsive layout, keyboard support, and reduced-motion support
 
-## Tech stack
+## Technology and data sources
 
-- React 19
-- Vite 8
-- Web Audio API
-- Open-Meteo Weather and Geocoding APIs
-- Official PAGASA tropical-cyclone bulletin pages through a server-side adapter
-- BigDataCloud reverse geocoding
+- React 19 and Vite 8
+- Web Audio API for locally generated ambient sound
+- [Open-Meteo](https://open-meteo.com/) for worldwide weather forecasts and location search
+- [PAGASA](https://www.pagasa.dost.gov.ph/) public tropical-cyclone bulletin pages through a server-side adapter
+- BigDataCloud for reverse geocoding
+- Vercel for the production site and PAGASA serverless function
+
+CliMate does not use AI chat, user accounts, a database, or private API keys.
 
 ## Requirements
 
-- Node.js `20.19+` or `22.12+`
+- Node.js 20.19 or newer, or Node.js 22.12 or newer
 - npm
 
-## Local setup
+## Run locally
 
-1. Clone the repository and enter its directory:
+```bash
+git clone https://github.com/arboledajerichop/CliMate.git
+cd CliMate
+npm install
+npm run dev
+```
 
-   ```bash
-   git clone https://github.com/arboledajerichop/JerichoMood-WeatherApp.git
-   cd JerichoMood-WeatherApp
-   ```
+Open the URL printed by Vite, normally `http://localhost:5173`. The local Vite middleware also provides `/api/pagasa`, so the Philippine bulletin section can be tested without Vercel CLI or environment variables.
 
-2. Install dependencies:
+## Scripts
 
-   ```bash
-   npm install
-   ```
-
-3. Start the development server:
-
-   ```bash
-   npm run dev
-   ```
-
-Open the local URL printed by Vite, usually `http://localhost:5173`. No API keys or environment variables are required.
-
-## Available scripts
-
-| Command | Description |
+| Command | Purpose |
 | --- | --- |
-| `npm run dev` | Starts the local development server. |
-| `npm run build` | Creates the production build in `dist/`. |
-| `npm run preview` | Serves the production build locally. |
-| `npm run lint` | Runs ESLint across the project. |
+| `npm run dev` | Start the local development server. |
+| `npm run build` | Create the production build in `dist/`. |
+| `npm run preview` | Preview the production build locally. |
+| `npm run lint` | Check the source with ESLint. |
 
-## Netlify deployment
+## Deploy to Vercel
 
-Import the GitHub repository into Netlify. The included `netlify.toml` runs the production build, publishes `dist`, and redirects application routes to `index.html`.
+1. Import the `CliMate` GitHub repository into Vercel.
+2. Keep the framework preset set to **Vite**.
+3. Deploy. No environment variables are required.
 
-## Vercel deployment
-
-Import the GitHub repository into Vercel and keep the framework preset set to **Vite**. The included `vercel.json` runs `npm run build` and publishes `dist`.
+The included [`vercel.json`](./vercel.json) builds the Vite app into `dist`. Vercel automatically serves [`api/pagasa.mjs`](./api/pagasa.mjs) as `/api/pagasa`.
 
 ## Project structure
 
 ```text
-src/
-  components/   Forecast, animated scene, preventive guidance, and PWA UI
-  services/     Weather, geocoding, and location requests
-  utils/        Activity scoring, local-time, weather-code, and wind helpers
-server/
-  pagasa.mjs         Official PAGASA bulletin reader and normalizer
 api/
-  pagasa.mjs         Vercel PAGASA function
-netlify/functions/
-  pagasa.mjs         Netlify PAGASA function
-worker/
-  index.js      Hosted app routing and geocoding proxy
-public/         App icons and other public assets
+  pagasa.mjs          Vercel serverless entry point
+server/
+  pagasa.mjs          PAGASA reader, normalizer, cache, and fallback handling
+src/
+  components/         Forecasts, animated scenery, guidance, navigation, and PWA UI
+  services/           Weather, location search, reverse geocoding, and PAGASA requests
+  utils/              Weather-code, local-time, scene, and wind helpers
+public/                CliMate logo and installable-app icons
+vite.config.js         Vite, PWA, and local PAGASA middleware configuration
+vercel.json            Vercel build configuration
 ```
 
-## Data and privacy
+## Data, privacy, and limitations
 
-- Forecast data comes from Open-Meteo.
-- Tropical-cyclone information comes directly from PAGASA's official public bulletin and advisory pages. PAGASA does not currently publish a documented public tropical-cyclone API, so the server adapter may need maintenance if PAGASA changes its page structure.
-- Every active cyclone card links to the original PAGASA page and available official PDF, track image, and wind-signal map.
-- Reverse geocoding uses BigDataCloud.
-- Saved locations, recent locations, temperature unit, and sound volume are stored only in the browser.
-- Ambient sounds are generated locally with the Web Audio API.
-- CliMate does not include AI chat, user accounts, or a database.
-
-Weather information can change quickly and should not replace official guidance during hazardous conditions.
+- Saved locations, recent locations, temperature units, and sound volume stay in the user's browser.
+- Ambient sounds are synthesized locally and do not stream audio files.
+- PAGASA does not currently provide a documented public tropical-cyclone API. The server adapter reads its official public pages and may need maintenance if PAGASA changes their structure.
+- Active PAGASA cards link back to the available official bulletin, PDF, track image, and wind-signal map.
+- Weather conditions can change quickly. During hazardous weather, follow the latest instructions from local authorities and official agencies.
 
 ## License
 
-No license is currently included in this repository.
+No license has been added yet. By default, all rights are reserved by the repository owner.

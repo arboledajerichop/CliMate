@@ -25,10 +25,10 @@ const DEFAULT_LOCATION = {
 };
 
 const STORAGE = {
-  location: "jerichomood-location",
-  unit: "jerichomood-unit",
-  favourites: "jerichomood-favourites",
-  recent: "jerichomood-recent",
+  location: "climate-location",
+  unit: "climate-unit",
+  favourites: "climate-favourites",
+  recent: "climate-recent",
 };
 
 function readJson(key, fallback) {

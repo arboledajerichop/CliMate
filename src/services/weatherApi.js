@@ -78,7 +78,3 @@ async function getOpenMeteoWeather(latitude, longitude, regionCode) {
 export function getCurrentWeather(latitude, longitude, regionCode = "") {
   return getOpenMeteoWeather(latitude, longitude, regionCode);
 }
-
-export function findCurrentHourIndex(hourly, currentTime) {
-  return currentHourIndex(hourly, currentTime);
-}

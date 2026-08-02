@@ -36,13 +36,7 @@ export async function searchLocations(searchText) {
     format: "json",
   });
 
-  const isHosted =
-    typeof window !== "undefined" &&
-    window.location.hostname.endsWith(".chatgpt.site");
-  const requestUrl = isHosted
-    ? `/api/geocode?${parameters}`
-    : `${GEOCODING_API_URL}?${parameters}`;
-  const response = await fetchWithTimeout(requestUrl);
+  const response = await fetchWithTimeout(`${GEOCODING_API_URL}?${parameters}`);
 
   if (!response.ok) {
     throw new Error("Unable to search for locations.");

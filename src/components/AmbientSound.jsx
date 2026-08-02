@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
 const STORAGE_VOLUME = "climate-ambient-volume";
-const LEGACY_STORAGE_VOLUME = "meteomood-ambient-volume";
 const MASTER_LEVEL = 0.58;
 
 const SOUND_PROFILES = {
@@ -130,10 +129,7 @@ function getSoundscapeDetails(sceneState, dayPeriod, weatherCode) {
 }
 
 function readSavedVolume() {
-  const saved = Number.parseFloat(
-    localStorage.getItem(STORAGE_VOLUME) ??
-      localStorage.getItem(LEGACY_STORAGE_VOLUME)
-  );
+  const saved = Number.parseFloat(localStorage.getItem(STORAGE_VOLUME));
   return Number.isFinite(saved) ? Math.min(1, Math.max(0.2, saved)) : 0.76;
 }
 

@@ -1,17 +1,11 @@
 import { Buffer } from "node:buffer";
-import { readFileSync } from "node:fs";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { handlePagasaRequest } from "./server/pagasa.mjs";
 
-const workerSource = readFileSync(
-  new URL("./worker/index.js", import.meta.url),
-  "utf8"
-);
-
-const hostedAppBundle = {
-  name: "jerichomood-hosted-app-bundle",
+const pagasaDevServer = {
+  name: "climate-pagasa-dev-server",
   configureServer(server) {
     server.middlewares.use(async (request, response, next) => {
       if (!request.url?.startsWith("/api/pagasa")) {
@@ -28,19 +22,12 @@ const hostedAppBundle = {
       response.end(Buffer.from(await webResponse.arrayBuffer()));
     });
   },
-  generateBundle() {
-    this.emitFile({
-      type: "asset",
-      fileName: "server/index.js",
-      source: workerSource,
-    });
-  },
 };
 
 export default defineConfig({
   plugins: [
     react(),
-    hostedAppBundle,
+    pagasaDevServer,
 
     VitePWA({
       registerType: "autoUpdate",
