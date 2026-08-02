@@ -75,7 +75,8 @@ export function getWeatherMeta(code) {
   return WEATHER_META.unknown;
 }
 
-export function getWeatherCondition(code) {
+export function getWeatherCondition(code, isDay = true) {
+  if (!isDay && code === 0) return "Clear night";
   return getWeatherMeta(code).label;
 }
 

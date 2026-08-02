@@ -1,20 +1,24 @@
-# JerichoMood
+# CliMate
 
-**Forecasts you can feel.**
+**See the weather. Plan better.**
 
-JerichoMood is a responsive weather application that combines practical forecasts with animated weather scenes, optional ambient sound, and a forecast-grounded activity assistant.
+CliMate is a responsive, installable weather application that combines practical forecasts with expressive animated scenes, preventive guidance, and optional ambient sound.
 
 ## Features
 
-- Current conditions, hourly forecasts, and a seven-day outlook
+- Current conditions, an interactive 24-hour Day in Motion timeline, and a seven-day outlook
 - City search and browser-based current location
 - Celsius and Fahrenheit support
-- Animated scenes for sunny, cloudy, windy, rainy, stormy, and snowy weather
-- Optional weather-matched ambient sound with volume control
-- Weather details including humidity, wind, rain probability, pressure, and UV index
-- Optional AI assistant for weather and activity questions
+- Animated student scenes for sunny, cloudy, windy, rainy, stormy, and snowy weather
+- Location-aware morning, daytime, sunset, and night scene variants
+- Optional spatial weather soundscapes with moving wind and rain, environmental layers, time-aware wildlife, and volume control
+- Corrected current-hour rain probability and UV information
+- Condition-aware preventive measures, dos and don'ts, and suggested weather windows
+- Clear rain-chance labels in the Day in Motion timeline and seven-day forecast
+- Saved and recently viewed locations
+- Philippine Typhoon Center with live official PAGASA bulletin, track, strength, movement, and wind-signal information
 - Installable Progressive Web App with offline app-shell support
-- Responsive and keyboard-accessible interface
+- Responsive, keyboard-accessible interface with reduced-motion support
 
 ## Tech stack
 
@@ -22,14 +26,13 @@ JerichoMood is a responsive weather application that combines practical forecast
 - Vite 8
 - Web Audio API
 - Open-Meteo Weather and Geocoding APIs
+- Official PAGASA tropical-cyclone bulletin pages through a server-side adapter
 - BigDataCloud reverse geocoding
-- Groq API for the optional weather assistant
 
 ## Requirements
 
 - Node.js `20.19+` or `22.12+`
 - npm
-- A Groq API key only if you want to use the AI assistant
 
 ## Local setup
 
@@ -46,29 +49,13 @@ JerichoMood is a responsive weather application that combines practical forecast
    npm install
    ```
 
-3. Optional: create `.env.local` to enable the weather assistant:
-
-   ```env
-   GROQ_API_KEY=your_groq_api_key
-   GROQ_MODEL=openai/gpt-oss-20b
-   ```
-
-4. Start the development server:
+3. Start the development server:
 
    ```bash
    npm run dev
    ```
 
-Open the local URL printed by Vite.
-
-## Environment variables
-
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `GROQ_API_KEY` | Optional | Enables the weather assistant. |
-| `GROQ_MODEL` | Optional | Overrides the default `openai/gpt-oss-20b` model. |
-
-Weather forecasts and location search do not require API keys.
+Open the local URL printed by Vite, usually `http://localhost:5173`. No API keys or environment variables are required.
 
 ## Available scripts
 
@@ -81,74 +68,39 @@ Weather forecasts and location search do not require API keys.
 
 ## Netlify deployment
 
-Deploy the complete repository through Netlify rather than uploading only the `dist` folder. The included `netlify.toml` builds the app, publishes `dist`, and deploys the serverless function used by `/api/ask`.
-
-In **Netlify > Project configuration > Environment variables**, add:
-
-```env
-GROQ_API_KEY=your_groq_api_key
-GROQ_MODEL=openai/gpt-oss-20b
-```
-
-Set the scope for `GROQ_API_KEY` and `GROQ_MODEL` to include **Functions**.
-After adding or changing either variable, trigger a new deployment. Never expose
-the Groq key through a `VITE_` variable or frontend code.
-
-After deployment, open `/api/ask` on your Netlify domain. A working function
-returns JSON similar to:
-
-```json
-{
-  "ok": true,
-  "configured": true,
-  "model": "openai/gpt-oss-20b"
-}
-```
-
-If `configured` is `false`, the key is missing from the Functions runtime. If
-the URL returns the app's HTML instead of JSON, deploy the complete Git
-repository rather than uploading only `dist`.
+Import the GitHub repository into Netlify. The included `netlify.toml` runs the production build, publishes `dist`, and redirects application routes to `index.html`.
 
 ## Vercel deployment
 
-Import the GitHub repository into Vercel and keep the detected framework preset
-as **Vite**. The included `vercel.json` runs `npm run build`, publishes `dist`,
-and deploys `api/ask.mjs` as the serverless endpoint used by the assistant.
-
-In **Vercel > Project Settings > Environment Variables**, add these variables
-for Production (and Preview if you want assistant testing on preview URLs):
-
-```env
-GROQ_API_KEY=your_groq_api_key
-GROQ_MODEL=openai/gpt-oss-20b
-```
-
-After adding or changing either variable, create a new deployment. Open
-`/api/ask` on the Vercel domain to verify the function. It should return JSON
-with `"configured": true` and `"platform": "vercel"`.
+Import the GitHub repository into Vercel and keep the framework preset set to **Vite**. The included `vercel.json` runs `npm run build` and publishes `dist`.
 
 ## Project structure
 
 ```text
-netlify/
-  functions/    Netlify serverless function for the weather assistant
 src/
-  components/   Interface, forecast, scene, sound, and assistant components
-  services/     Weather, geocoding, location, and assistant requests
-  utils/        Weather-code and wind-direction helpers
+  components/   Forecast, animated scene, preventive guidance, and PWA UI
+  services/     Weather, geocoding, and location requests
+  utils/        Activity scoring, local-time, weather-code, and wind helpers
+server/
+  pagasa.mjs         Official PAGASA bulletin reader and normalizer
+api/
+  pagasa.mjs         Vercel PAGASA function
+netlify/functions/
+  pagasa.mjs         Netlify PAGASA function
 worker/
-  index.js      API handlers for the optional assistant and hosted geocoding
-public/         App icons, manifest, social preview, and service worker
+  index.js      Hosted app routing and geocoding proxy
+public/         App icons and other public assets
 ```
 
 ## Data and privacy
 
 - Forecast data comes from Open-Meteo.
+- Tropical-cyclone information comes directly from PAGASA's official public bulletin and advisory pages. PAGASA does not currently publish a documented public tropical-cyclone API, so the server adapter may need maintenance if PAGASA changes its page structure.
+- Every active cyclone card links to the original PAGASA page and available official PDF, track image, and wind-signal map.
 - Reverse geocoding uses BigDataCloud.
-- If enabled, assistant questions and the displayed forecast are sent to Groq through `/api/ask`.
-- Location, temperature-unit, and sound-volume preferences are stored only in the browser.
+- Saved locations, recent locations, temperature unit, and sound volume are stored only in the browser.
 - Ambient sounds are generated locally with the Web Audio API.
-- JerichoMood does not include user accounts or a database.
+- CliMate does not include AI chat, user accounts, or a database.
 
 Weather information can change quickly and should not replace official guidance during hazardous conditions.
 

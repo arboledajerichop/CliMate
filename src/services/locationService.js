@@ -60,7 +60,7 @@ export function getUserLocation() {
   });
 }
 
-export async function getLocationName(latitude, longitude) {
+export async function getLocationDetails(latitude, longitude) {
   const parameters = new URLSearchParams({
     latitude: latitude.toString(),
     longitude: longitude.toString(),
@@ -73,12 +73,10 @@ export async function getLocationName(latitude, longitude) {
   const response = await fetch(`${url}?${parameters}`);
 
   if (!response.ok) {
-    return "Current Location";
+    return { name: "Current Location", countryCode: "" };
   }
 
   const data = await response.json();
-
-  console.log("Reverse geocoding response:", data);
 
   const place =
     data.locality ||
@@ -90,7 +88,15 @@ export async function getLocationName(latitude, longitude) {
     data.countryName || data.countryCode
   );
 
-  return buildLocationName(place, country);
+  return {
+    name: buildLocationName(place, country),
+    countryCode: data.countryCode || "",
+  };
+}
+
+export async function getLocationName(latitude, longitude) {
+  const details = await getLocationDetails(latitude, longitude);
+  return details.name;
 }
 
 function buildLocationName(place, country) {

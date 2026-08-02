@@ -1,4 +1,5 @@
 import WeatherIcon from "./WeatherIcon";
+import { getWeatherMeta } from "../utils/weatherCode";
 
 function DailyForecast({ daily, convertTemperature }) {
   if (!daily?.time?.length) return null;
@@ -20,19 +21,34 @@ function DailyForecast({ daily, convertTemperature }) {
       </div>
 
       <div className="daily-list">
-        {daily.time.map((date, index) => (
-          <article className="daily-row" key={date}>
-            <p>{formatDay(date, index)}</p>
-            <WeatherIcon code={daily.weather_code[index]} size="small" />
-            <span className="daily-rain" aria-label={`${daily.precipitation_probability_max[index] ?? 0}% chance of rain`}>
-              <i aria-hidden="true" /> {daily.precipitation_probability_max[index] ?? 0}%
-            </span>
-            <div className="daily-temps">
-              <strong>{convertTemperature(daily.temperature_2m_max[index])}°</strong>
-              <span>{convertTemperature(daily.temperature_2m_min[index])}°</span>
-            </div>
-          </article>
-        ))}
+        {daily.time.map((date, index) => {
+          const rainChance = daily.precipitation_probability_max[index] ?? 0;
+          const condition = getWeatherMeta(daily.weather_code[index]).label;
+          const high = convertTemperature(daily.temperature_2m_max[index]);
+          const low = convertTemperature(daily.temperature_2m_min[index]);
+
+          return (
+            <article
+              className="daily-row"
+              key={date}
+              aria-label={`${formatDay(date, index)}, ${condition}, ${rainChance}% chance of rain, high ${high} degrees, low ${low} degrees`}
+            >
+              <div className="daily-day">
+                <strong>{formatDay(date, index)}</strong>
+                <span>{condition}</span>
+              </div>
+              <WeatherIcon code={daily.weather_code[index]} size="small" />
+              <div className="daily-rain">
+                <span>Rain chance</span>
+                <strong>{rainChance}%</strong>
+              </div>
+              <div className="daily-temps">
+                <strong><small>H</small>{high}°</strong>
+                <span><small>L</small>{low}°</span>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </section>
   );

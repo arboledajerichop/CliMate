@@ -1,14 +1,15 @@
-import { getWeatherMeta } from "../utils/weatherCode";
+import { getWeatherCondition, getWeatherMeta } from "../utils/weatherCode";
 
-function WeatherIcon({ code, size = "medium", decorative = false }) {
+function WeatherIcon({ code, size = "medium", decorative = false, isDay = true }) {
   const meta = getWeatherMeta(code);
+  const condition = getWeatherCondition(code, isDay);
 
   return (
     <span
-      className={`weather-icon weather-icon--${meta.group} weather-icon--${size}`}
+      className={`weather-icon weather-icon--${meta.group} weather-icon--${size} weather-icon--${isDay ? "day" : "night"}`}
       role={decorative ? undefined : "img"}
       aria-hidden={decorative || undefined}
-      aria-label={decorative ? undefined : meta.label}
+      aria-label={decorative ? undefined : condition}
     >
       <span className="wi-sun">
         <i />
@@ -16,6 +17,7 @@ function WeatherIcon({ code, size = "medium", decorative = false }) {
         <i />
         <i />
       </span>
+      <span className="wi-moon"><i /></span>
       <span className="wi-cloud">
         <i />
       </span>
